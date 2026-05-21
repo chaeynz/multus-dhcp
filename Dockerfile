@@ -1,9 +1,17 @@
-FROM alpine:3.23.4
-RUN apk add --update \
-	curl \
-  && curl -SLO https://github.com/containernetworking/plugins/releases/download/v1.9.1/cni-plugins-linux-amd64-v1.9.1.tgz \
-  && curl -SLO https://github.com/containernetworking/plugins/releases/download/v1.9.1/cni-plugins-linux-amd64-v1.9.1.tgz.sha256 \
-  && sha256sum -c cni-plugins-linux-amd64-v1.9.1.tgz.sha256 \
-  && tar xvfpz cni-plugins-linux-amd64-v1.9.1.tgz
+FROM alpine:3.23.4 AS builder
 
-ENTRYPOINT ["./dhcp", "daemon", "-hostprefix", "/host"]
+ARG CNI_PLUGINS_VER
+
+RUN apk add --update --no-cache curl \
+  && curl -SLO https://github.com/containernetworking/plugins/releases/download/${CNI_PLUGINS_VER}/cni-plugins-linux-amd64-${CNI_PLUGINS_VER}.tgz \
+  && curl -SLO https://github.com/containernetworking/plugins/releases/download/${CNI_PLUGINS_VER}/cni-plugins-linux-amd64-${CNI_PLUGINS_VER}.tgz.sha256 \
+  && sha256sum -c cni-plugins-linux-amd64-${CNI_PLUGINS_VER}.tgz.sha256 \
+  && tar xvfpz cni-plugins-linux-amd64-${CNI_PLUGINS_VER}.tgz
+
+FROM alpine:3.23.4
+
+WORKDIR /opt/cni/bin
+
+COPY --from=builder /dhcp .
+
+ENTRYPOINT ["/opt/cni/bin/dhcp", "daemon", "-hostprefix", "/host"]
