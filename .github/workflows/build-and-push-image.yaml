@@ -1,10 +1,14 @@
 ---
-name: push
+name: build-and-push-image
 
 on:
   push:
     branches:
       - main
+    paths:
+      - Dockerfile
+      - build.sh
+      - cni_plugins_version.env
 
   workflow_dispatch:
 
