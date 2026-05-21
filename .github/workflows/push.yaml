@@ -32,6 +32,6 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - id: build-push-image
-        name: Build and Push netbox docker image
+        name: Build and Push docker image
         run: ./build.sh --push
         shell: bash

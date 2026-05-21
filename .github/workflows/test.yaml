@@ -1,0 +1,25 @@
+---
+name: test
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    name: Run a test
+    steps:
+      - id: source-checkout
+        name: Checkout
+        uses: actions/checkout@v5
+
+      - id: test
+        name: Test the docker build
+        run: ./test.sh
+        shell: bash
